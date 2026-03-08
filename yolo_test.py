@@ -1,10 +1,31 @@
+import cv2
 from ultralytics import YOLO
 
-# modeli yükle
+# model yükle
 model = YOLO("yolov8n.pt")
 
-# görüntü üzerinde çalıştır
-results = model("test3.jpg")
+# webcam aç
+cap = cv2.VideoCapture(0)
 
-# sonucu göster
-results[0].show()
+while True:
+
+    ret, frame = cap.read()
+
+    if not ret:
+        break
+
+    # YOLO detection
+    results = model(frame)
+
+    # bounding box çiz
+    annotated_frame = results[0].plot()
+
+    # ekrana göster
+    cv2.imshow("YOLO Detection", annotated_frame)
+
+    # q tuşuna basınca çık
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
