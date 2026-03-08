@@ -2,6 +2,7 @@ import cv2
 from ultralytics import YOLO
 
 model = YOLO("yolov8n.pt")
+last_positions = {}
 
 cap = cv2.VideoCapture(0)
 
@@ -33,10 +34,16 @@ while True:
             cx = int((x1+x2)/2)
             cy = int((y1+y2)/2)
 
-            if cy > line_y and track_id not in crossed_ids:
+            if track_id in last_positions:
 
-                crossed_ids.add(track_id)
-                count += 1
+                prev_y = last_positions[track_id]
+
+                if prev_y < line_y and cy > line_y and track_id not in crossed_ids:
+
+                    crossed_ids.add(track_id)
+                    count += 1
+
+            last_positions[track_id] = cy
 
             cv2.rectangle(frame,(x1,y1),(x2,y2),(255,0,0),2)
 
